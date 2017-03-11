@@ -3,8 +3,7 @@ platform: linux
 image_resource:
   type: docker-image
   source:
-    repository: java
-    tag: "8"
+    repository: boyi/java
 
 inputs:
 - name: source-code
