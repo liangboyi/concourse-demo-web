@@ -4,7 +4,7 @@ image_resource:
   type: docker-image
   source:
     repository: boyi/java
-
+    tag: latest
 inputs:
 - name: source-code
 
