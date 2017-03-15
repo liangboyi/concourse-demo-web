@@ -1,6 +1,0 @@
----
-applications:
-- name: concourse-demo-web
-  memory: 1G
-  env:
-    concourseRestfulUrl: https://concourse-demo-restful.pcfdemo.com/restInfo
