@@ -3,20 +3,20 @@ resources:
 - name: repo-develop
   type: git
   source:
+    uri: git@github.com:liangboyi/concourse-demo-web.git
     branch: develop
-    uri: git@github:liangboyi/concourse-demo-web.git
     private_key: {{github-private-key}}
 - name: repo-release
   type: git
   source:
+    uri: git@github.com:liangboyi/concourse-demo-web.git
     branch: release
-    uri: git@github:liangboyi/concourse-demo-web.git
     private_key: {{github-private-key}}
 - name: repo-master
   type: git
   source:
+    uri: git@github.com:liangboyi/concourse-demo-web.git
     branch: master
-    uri: git@github:liangboyi/concourse-demo-web.git
     private_key: {{github-private-key}}
 - name: version
   type: semver
@@ -46,7 +46,6 @@ resources:
     organization: {{cf-organization}}
     space: {{cf-space-staging}}
     skip_cert_check: true
-    current_app_name: concourse-demo-web-staging
 - name: cf-prod
   type: cf
   source:
@@ -215,17 +214,17 @@ jobs:
         repository: out
 
 - name: deploy-web-prod
-public: true
-plan:
-- get: repo
-  resource: repo-release
-  trigger: true
-  passed:
-    - test-web-release
-- task: package
-  file: repo/concourse/tasks/package-web.yml
-- put: cf-prod
-  params:
-    manifest: repo/manifest/concourse-demo-web-manifest-prod.yml
-    path: target-web/concourse-demo-web.jar
-    current_app_name: concourse-demo-web
+  public: true
+  plan:
+  - get: repo
+    resource: repo-release
+    trigger: true
+    passed:
+      - merge-release-to-develop
+  - task: package
+    file: repo/concourse/tasks/package-web.yml
+  - put: cf-prod
+    params:
+      manifest: repo/manifest/concourse-demo-web-manifest-prod.yml
+      path: target-web/concourse-demo-web.jar
+      current_app_name: concourse-demo-web
