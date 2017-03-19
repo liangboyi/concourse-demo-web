@@ -1,38 +1,231 @@
 ---
 resources:
-- name: source-code
+- name: repo-develop
+  type: git
+  source:
+    branch: develop
+    uri: git@github:liangboyi/concourse-demo-web.git
+    private_key: {{github-private-key}}
+- name: repo-release
+  type: git
+  source:
+    branch: release
+    uri: git@github:liangboyi/concourse-demo-web.git
+    private_key: {{github-private-key}}
+- name: repo-master
   type: git
   source:
     branch: master
-    uri: https://github.com/liangboyi/concourse-demo-web
-- name: cloudfoundry
+    uri: git@github:liangboyi/concourse-demo-web.git
+    private_key: {{github-private-key}}
+- name: version
+  type: semver
+  source:
+    uri: git@github.com:liangboyi/concourse-demo-web.git
+    branch: version
+    private_key: {{github-private-key}}
+    file: version
+    driver: git
+    initial_version: 0.5.0
+
+- name: cf-dev
   type: cf
   source:
     api: {{cf-api}}
     username: {{cf-username}}
     password: {{cf-password}}
     organization: {{cf-organization}}
-    space: {{cf-space}}
+    space: {{cf-space-dev}}
+    skip_cert_check: true
+- name: cf-staging
+  type: cf
+  source:
+    api: {{cf-api}}
+    username: {{cf-username}}
+    password: {{cf-password}}
+    organization: {{cf-organization}}
+    space: {{cf-space-staging}}
+    skip_cert_check: true
+    current_app_name: concourse-demo-web-staging
+- name: cf-prod
+  type: cf
+  source:
+    api: {{cf-api}}
+    username: {{cf-username}}
+    password: {{cf-password}}
+    organization: {{cf-organization}}
+    space: {{cf-space-prod}}
     skip_cert_check: true
 
 jobs:
-- name: unit-test-web
+#for develop
+- name: test-web-develop
   public: true
   plan:
-  - get: source-code
+  - get: repo
+    resource: repo-develop
     trigger: true
   - task: unit-test
-    file: source-code/concourse/tasks/unit-test-web.yml
-- name: deploy-web
+    file: repo/concourse/tasks/unit-test-web.yml
+
+- name: deploy-web-develop
   public: true
   plan:
-  - get: source-code
+  - get: repo
+    resource: repo-develop
     trigger: true
     passed:
-      - unit-test-web
+      - test-web-develop
   - task: package
-    file: source-code/concourse/tasks/package-web.yml
-  - put: cloudfoundry
+    file: repo/concourse/tasks/package-web.yml
+  - put: cf-dev
     params:
-      manifest: source-code/manifest/concourse-demo-web-manifest.yml
+      manifest: repo/manifest/concourse-demo-web-manifest-dev.yml
       path: target-web/concourse-demo-web.jar
+      current_app_name: concourse-demo-web-dev
+
+#for release
+- name: test-web-release
+  public: true
+  plan:
+  - get: repo
+    resource: repo-release
+    trigger: true
+  - task: unit-test
+    file: repo/concourse/tasks/unit-test-web.yml
+
+- name: deploy-web-release
+  public: true
+  plan:
+  - get: repo
+    resource: repo-release
+    trigger: true
+    passed:
+      - test-web-release
+  - task: package
+    file: repo/concourse/tasks/package-web.yml
+  - put: cf-staging
+    params:
+      manifest: repo/manifest/concourse-demo-web-manifest-staging.yml
+      path: target-web/concourse-demo-web.jar
+      current_app_name: concourse-demo-web-staging
+
+#for master
+- name: merge-release-to-master
+  public: true
+  plan:
+    - aggregate:
+      - get: repo
+        resource: repo-master
+      - get: repo-release
+        passed: 
+          - test-web-release
+    - task: merge-release-to-master
+      file: repo-release/concourse/tasks/merge-release-branch.yml
+      params:
+        GIT_EMAIL: {{git-email}}
+        GIT_NAME: {{git-name}}
+        MERGE_TO: master
+    - put: repo
+      resource: repo-master
+      params:
+        repository: out
+
+- name: test-web-master
+  serial: true
+  public: true
+  plan:
+    - aggregate:
+      - get: repo
+        resource: repo-master
+        passed: 
+          - merge-release-to-master
+        trigger: true
+    - task: unit-test
+      file: repo/concourse/tasks/unit-test-web.yml
+
+- name: tag-master
+  public: true
+  plan:
+    - aggregate:
+      - get:  repo
+        resource: repo-master
+        passed: 
+          - test-web-master
+        trigger: true
+      - get: repo-release
+      - get: version
+    - task: bump-to-release-version
+      file: repo-release/concourse/tasks/bump-to-release-version.yml
+      params:
+        GIT_EMAIL: {{git-email}}
+        GIT_NAME: {{git-name}}
+    - put: repo
+      resource: repo-master
+      params:
+        repository: out
+        tag: version/number
+
+#设置一下个版本号码
+- name: bump-version
+  public: true
+  plan:
+    - aggregate:
+      - get:  repo-master
+        passed: 
+          - tag-master
+        trigger: true
+      - get:  repo
+        resource: repo-release
+      - get: version
+        params: 
+          bump: minor
+    - task: bump-to-next-develop-version
+      file: repo/concourse/tasks/bump-to-next-develop-version.yml
+      params:
+        GIT_EMAIL: {{git-email}}
+        GIT_NAME: {{git-name}}
+    - put: repo
+      resource: repo-release
+      params:
+        repository: out
+    - put: version
+      params: 
+        file: version/number
+
+- name: merge-release-to-develop
+  public: true
+  plan:
+    - aggregate:
+      - get: repo
+        resource: repo-develop
+      - get: repo-release
+        passed: 
+          - bump-version
+        trigger: true
+    - task: merge-release-to-develop
+      file: repo-release/concourse/tasks/merge-release-branch.yml
+      params:
+        GIT_EMAIL: {{git-email}}
+        GIT_NAME: {{git-name}}
+        MERGE_TO: develop
+    - put: repo
+      resource: repo-develop
+      params:
+        repository: out
+
+- name: deploy-web-prod
+public: true
+plan:
+- get: repo
+  resource: repo-release
+  trigger: true
+  passed:
+    - test-web-release
+- task: package
+  file: repo/concourse/tasks/package-web.yml
+- put: cf-prod
+  params:
+    manifest: repo/manifest/concourse-demo-web-manifest-prod.yml
+    path: target-web/concourse-demo-web.jar
+    current_app_name: concourse-demo-web

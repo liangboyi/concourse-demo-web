@@ -1,0 +1,1 @@
+fly set-pipeline -t ci-demo -c concourse/pipeline.yml --pipeline concourse-web -l /Users/bliang/cf_pws_credential.yml  --non-interactive

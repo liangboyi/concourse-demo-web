@@ -7,7 +7,9 @@ image_resource:
     tag: "8"
     insecure_registries: ["10.34.54.29:5000"]
 inputs:
-- name: repo
-
+  - name: repo
+  - name: repo-release
+outputs:
+  - name: out
 run:
-  path: repo/concourse/tasks/unit-test-web.sh
+  path: repo-release/ci/tasks/merge-release-branch.sh

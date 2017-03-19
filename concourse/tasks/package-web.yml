@@ -7,10 +7,10 @@ image_resource:
     tag: "8"
     insecure_registries: ["10.34.54.29:5000"]
 inputs:
-- name: source-code
+- name: repo
 
 outputs:
 - name: target-web
 
 run:
-  path: source-code/concourse/tasks/package-web.sh
+  path: repo/concourse/tasks/package-web.sh

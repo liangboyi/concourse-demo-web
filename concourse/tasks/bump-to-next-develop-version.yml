@@ -7,7 +7,10 @@ image_resource:
     tag: "8"
     insecure_registries: ["10.34.54.29:5000"]
 inputs:
-- name: repo
-
+  - name: version
+  - name: repo
+  - name: repo-master
+outputs:
+  - name: out
 run:
-  path: repo/concourse/tasks/unit-test-web.sh
+  path: repo/concourse/tasks/bump-to-next-develop-version.sh
