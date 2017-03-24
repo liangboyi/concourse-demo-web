@@ -12,4 +12,4 @@ inputs:
 outputs:
   - name: out
 run:
-  path: repo-release/ci/tasks/merge-release-branch.sh
+  path: repo-release/concourse/tasks/merge-release-branch.sh

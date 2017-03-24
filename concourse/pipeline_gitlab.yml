@@ -4,44 +4,56 @@ resources:
   type: git
   check_every: 10s
   source:
+    #github
     #uri: git@github.com:liangboyi/concourse-demo-web.git
-    uri: https://github.com/liangboyi/concourse-demo-web
+    #uri: https://github.com/liangboyi/concourse-demo-web
+    #gitlab
+    uri: git@10.34.54.29:boyi/concourse-demo-web.git
     branch: develop
-    #private_key: {{github-private-key}}
-    username: {{git-username}}
-    password: {{git-password}}
+    private_key: {{github-private-key}}
+    #username: {{git-username}}
+    #password: {{git-password}}
 - name: repo-release
   type: git
   check_every: 10s
   source:
+    #github
     #uri: git@github.com:liangboyi/concourse-demo-web.git
-    uri: https://github.com/liangboyi/concourse-demo-web
+    #uri: https://github.com/liangboyi/concourse-demo-web
+    #gitlab
+    uri: git@10.34.54.29:boyi/concourse-demo-web.git
     branch: release
-    #private_key: {{github-private-key}}
-    username: {{git-username}}
-    password: {{git-password}}
+    private_key: {{github-private-key}}
+    #username: {{git-username}}
+    #password: {{git-password}}
   check_every: 5s #only for demo
 - name: repo-master
   type: git
   check_every: 10s
   source:
+    #github
     #uri: git@github.com:liangboyi/concourse-demo-web.git
-    uri: https://github.com/liangboyi/concourse-demo-web
+    #uri: https://github.com/liangboyi/concourse-demo-web
+    #gitlab
+    uri: git@10.34.54.29:boyi/concourse-demo-web.git
     branch: master
-    #private_key: {{github-private-key}}
-    username: {{git-username}}
-    password: {{git-password}}
+    private_key: {{github-private-key}}
+    #username: {{git-username}}
+    #password: {{git-password}}
   check_every: 5s #only for demo
 - name: version
   type: semver
   check_every: 10s
   source:
+    #github
     #uri: git@github.com:liangboyi/concourse-demo-web.git
-    uri: https://github.com/liangboyi/concourse-demo-web
+    #uri: https://github.com/liangboyi/concourse-demo-web
+    #gitlab
+    uri: git@10.34.54.29:boyi/concourse-demo-web.git
     branch: version
-    #private_key: {{github-private-key}}
-    username: {{git-username}}
-    password: {{git-password}}
+    private_key: {{github-private-key}}
+    #username: {{git-username}}
+    #password: {{git-password}}
     file: version
     driver: git
     initial_version: 0.5.0
