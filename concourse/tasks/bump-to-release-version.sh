@@ -7,7 +7,7 @@ MESSAGE="[Concourse CI] Release $VERSION"
 cd out
 
 #资源库代码放入out目录
-mv -f ../repo/* ./
+mv -f ../repo/* ../repo/.[^.]* ./
 
 #修改pom.xml中的version内容
 echo "Bump to ($VERSION)"
