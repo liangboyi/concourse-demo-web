@@ -4,6 +4,7 @@ MESSAGE="[Concourse CI] Merge release to ${MERGE_TO}"
 
 #将repo中内容放置out中
 cd out
+export GIT_DISCOVERY_ACROSS_FILESYSTEM=1
 mv -f ../repo/* ./
 
 #配置基本的git参数
