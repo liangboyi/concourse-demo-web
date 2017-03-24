@@ -5,7 +5,7 @@ MESSAGE="[Concourse CI] Bump to Next Development Version ($VERSION)"
 
 #将repo中内容(release)移动到out
 cd out
-mv -f ../repo/* ./
+mv -f ../repo/* ../repo/.[^.]* ./
 
 #修改pom.xml中的verison内容
 echo "Bump to $VERSION"
