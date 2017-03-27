@@ -1,0 +1,17 @@
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: 10.34.54.29:5000/java
+    tag: "8"
+    insecure_registries: ["10.34.54.29:5000"]
+inputs:
+  - name: repo
+  - name: repo-release
+
+outputs:
+- name: out-release
+
+run:
+  path: repo-release/concourse/tasks/update-release.sh
