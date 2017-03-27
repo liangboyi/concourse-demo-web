@@ -7,6 +7,10 @@ MESSAGE="[Concourse CI] Bump to Next Development Version ($VERSION)"
 cd out
 mv -f ../repo/* ../repo/.[^.]* ./
 
+#merge master to release
+git remote add -f master ../repo-master
+git merge --no-edit master/master
+
 #修改pom.xml中的verison内容
 echo "Bump to $VERSION"
 ./mvnw versions:set -DnewVersion=${VERSION} -DallowSnapshots
