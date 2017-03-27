@@ -194,14 +194,14 @@ jobs:
       params:
         repository: out
         tag: version/number
-    - task: update-release
-      file: repo-release/concourse/tasks/update-release.yml
-      params:
-        GIT_EMAIL: {{git-email}}
-        GIT_NAME: {{git-username}}
-    - put: repo-release
-      params:
-        repository: out-release
+    #- task: update-release
+    #  file: repo-release/concourse/tasks/update-release.yml
+    #  params:
+    #    GIT_EMAIL: {{git-email}}
+    #    GIT_NAME: {{git-username}}
+    #- put: repo-release
+    #  params:
+    #    repository: out-release
 
 #设置一下个版本号码
 - name: bump-version
