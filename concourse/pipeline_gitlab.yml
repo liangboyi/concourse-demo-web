@@ -201,7 +201,7 @@ jobs:
         GIT_NAME: {{git-username}}
     - put: repo-release
       params:
-        repository: release-out
+        repository: out-release
 
 #设置一下个版本号码
 - name: bump-version
