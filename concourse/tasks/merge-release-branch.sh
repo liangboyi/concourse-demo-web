@@ -14,4 +14,4 @@ git config --global user.name "${GIT_NAME}"
 
 #把release merge到资源repo中
 git remote add -f release ../repo-release
-git merge --no-edit release/release -m '${MESSAGE}'
+git merge --no-edit release/release -m "${MESSAGE}"
