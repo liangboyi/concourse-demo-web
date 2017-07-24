@@ -3,9 +3,9 @@ platform: linux
 image_resource:
   type: docker-image
   source:
-    repository: 127.0.0.1:5000/java
+    repository: 172.16.139.1:5000/java
     tag: "8"
-    insecure_registries: ["127.0.0.1:5000"]
+    insecure_registries: ["172.16.139.1:5000"]
 inputs:
 - name: source-code
 
