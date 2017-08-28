@@ -3,7 +3,7 @@ resources:
 - name: source-code
   type: git
   source:
-    branch: master
+    branch: simple
     uri: https://github.com/liangboyi/concourse-demo-web
 - name: cloudfoundry
   type: cf
